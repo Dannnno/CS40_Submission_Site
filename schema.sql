@@ -2,6 +2,6 @@ DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
     userid INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL,
+    username TEXT NOT NULL UNIQUE,
     passwordhash TEXT NOT NULL
 );

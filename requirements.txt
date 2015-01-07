@@ -1,4 +1,6 @@
 flask>=0.10
-flask_login
-flask_admin
-flask_bcrypt
+flask-login
+flask-admin
+flask-bcrypt
+flask-wtf
+wtforms

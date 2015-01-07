@@ -3,11 +3,12 @@
 	<title>CS 40 Class Submission Site</title>
 </head>
 <body>
-	<h1>Login Page</h1>
-	<form method="POST" action='{{ url_for("login") }}'>
+	<h1>Create an account</h1>
+	<form method="POST" action='{{ url_for("new_account") }}'>
 		Username <input type=text name='username'><br>
 		Password <input type=password name='password'><br>
-		Remember Me <input type=checkbox name='remember'><br>
+		Confirm Password <input type=password name='confirm_password'>
+		<br>
 		<input type=submit name='submit' value='Submit'>
 	</form>
 	<div>
