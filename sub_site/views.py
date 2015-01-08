@@ -1,6 +1,7 @@
 import sqlite3
 
-from flask import request, render_template, redirect, flash, session, url_for
+from flask import request, render_template, redirect, flash, session, \
+    url_for, g
 from flask.ext.login import current_user, login_user, logout_user, \
     login_required
 
@@ -10,20 +11,39 @@ from sub_site.handle_login import main as login_main
 from sub_site.users import User
 
 query_db = db_main(app)
-login_manager, LoginForm = login_main(app, bcrypt_app)
+login_manager, LoginForm, CreateUserForm = login_main(app, bcrypt_app)
+
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.get(userid)
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
 @app.route('/')
+@app.route('/index')
 def index():
     if current_user.is_authenticated():
         return render_template('index.html')
     else:
-        return render_template('login.html')
+        return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if getattr(g, 'user', None) is not None and g.user.is_authenticated():
+        return redirect(url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        userid = query_db("SELECT userid FROM users WHERE username=?",
+                          (request.form.username,))
+        login_user(userid)
     if request.method == 'POST':
+        form = LoginForm()
         return validate_login(request.form['username'],
                               request.form['password'],
                               'remember' in request.form)
