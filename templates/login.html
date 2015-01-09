@@ -1,18 +1,12 @@
-<!DOCTYPE html>
-<head>
-	<title>CS 40 Class Submission Site</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}CS 40 Submission Site - Login Page{% endblock %}
+{% block content %}
 	<h1>Login Page</h1>
 	<form method="POST" action='{{ url_for("login") }}'>
-		Username <input type=text name='username'><br>
-		Password <input type=password name='password'><br>
-		Remember Me <input type=checkbox name='remember'><br>
+		{{ form.hidden_tag() }}
+		Username {{ form.username }}<br>
+		Password {{ form.password }}<br>
+		Remember Me {{ form.remember }}<br>
 		<input type=submit name='submit' value='Submit'>
 	</form>
-	<div>
-		<p>
-			Written by Dan Obermiller
-		</p>
-	</div>
-</body>
+{% endblock %}

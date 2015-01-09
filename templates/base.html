@@ -1,0 +1,21 @@
+<!DOCTYPE HTML>
+<head>
+	{% block head %}
+	<title>{% block title %}{% endblock %}</title>
+	{% endblock%}
+</head>
+<body>
+	{% if error %}
+		<div>
+			{{ error  }}
+		</div>
+	{% endif %}
+	{% block content %}{% endblock %}
+	{% block footer %}
+		<div>
+			<p>
+				Written by Dan Obermiller
+			</p>
+		</div>
+	{% endblock %}
+</body>
