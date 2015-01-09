@@ -1,6 +1,4 @@
-import sqlite3
-
-from flask import request, render_template, redirect, flash, session, url_for
+from flask import render_template, redirect, url_for, g
 from flask.ext.login import current_user, login_user, logout_user, \
     login_required
 
@@ -9,70 +7,79 @@ from sub_site.handle_database import main as db_main
 from sub_site.handle_login import main as login_main
 from sub_site.users import User
 
+
 query_db = db_main(app)
-login_manager, LoginForm = login_main(app, bcrypt_app)
+login_manager, LoginForm, CreateUserForm = login_main(app, bcrypt_app)
+
+
+@login_manager.user_loader
+def load_user(userid):
+    return User.get(userid)
+
+
+@app.before_first_request
+def load_all_users():
+    query = "SELECT * FROM users"
+    results = query_db(query)
+    for userid, username, _ in results:
+        User(userid, username)
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
 @app.route('/')
+@app.route('/index')
 def index():
     if current_user.is_authenticated():
         return render_template('index.html')
     else:
-        return render_template('login.html')
+        return redirect(url_for('login'))
+
+
+@app.route('/success')
+def success():
+    return 'working'
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        return validate_login(request.form['username'],
-                              request.form['password'],
-                              'remember' in request.form)
+    form = LoginForm()
+    error = None
+    try:
+        valid_form = form.validate_on_submit()
+    except IndexError:
+        return redirect(url_for('new_account'))
     else:
-        if not current_user.is_authenticated():
-            return render_template('login.html')
-        else:
-            return render_template('index.html')
-
-
-def validate_login(username, password, remember=False):
-    query = """SELECT userid, passwordhash
-               FROM users
-               WHERE username=?"""
-    args = (username,)
-    userid, correct_hash = query_db(query, args)[0]
-    print bcrypt_app.check_password_hash(correct_hash, password)
-    # print login_user(User(userid), remember=remember)
-    return render_template('index.html')
+        if valid_form:
+            userid = query_db("SELECT userid FROM users WHERE username=?",
+                              [form.username.data])[0][0]
+            user = load_user(userid)
+            if user is None:
+                error = "No such user"
+            else:
+                login_user(user)
+                return redirect(url_for('success'))
+    return render_template('login.html', form=form, error=error)
 
 
 @app.route('/new_account', methods=['GET', 'POST'])
 def new_account():
-    if request.method == 'POST':
-        return create_account(request.form['username'],
-                              request.form['password'],
-                              request.form['confirm_password'])
-    return render_template("create.html")
-
-
-def create_account(username, password, confirm):
-    query = "INSERT INTO users (username, passwordhash) VALUES (?, ?)"
-    args = username, bcrypt_app.generate_password_hash(password)
-    if password == confirm:
-        try:
-            query_db(query, args)
-        except sqlite3.IntegrityError:   # existing username
-            return render_template("create.html")
-        else:
-            return render_template('index.html')
-    else:
-        return render_template("create.html")
+    form = CreateUserForm()
+    if form.validate_on_submit():
+        print form, vars(form)
+        return redirect(url_for('success'))
+    return render_template(
+        "create.html", form=form, error="Invalid username or password")
 
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('/'))
+    return redirect(url_for('index'))
 
 
 @app.route('/static/<name>')

@@ -1,9 +1,27 @@
-from flask.ext.login import UserMixin
-
-
-class User(UserMixin):
+class User(object):
     users = {}
 
-    def __init__(self, *args, **kwargs):
-        super(User, self).__init__(*args, **kwargs)
-        User.users[self.get_id()] = self
+    @classmethod
+    def get(cls, userid):
+        userid = unicode(userid)
+        return cls.users.get(userid, None)
+
+    def __init__(self, userid, username):
+        self._id = unicode(userid)
+        self.username = username
+        User.users[self._id] = self
+
+    @staticmethod
+    def is_authenticated():
+        return True
+
+    @staticmethod
+    def is_active():
+        return True
+
+    @staticmethod
+    def is_anonymous():
+        return False
+
+    def get_id(self):
+        return self._id
