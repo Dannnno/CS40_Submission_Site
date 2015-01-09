@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %} Uploaded Files {% endblock %}
+{% block content %}
+	<h1>Files that have been uploaded</h1>
+	{% for file_ in directory %}
+		<div>{{ file_ }}</div>
+	{% endfor %}
+{% endblock %}

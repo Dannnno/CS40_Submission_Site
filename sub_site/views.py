@@ -5,9 +5,10 @@ from flask.ext.login import current_user, login_user, logout_user, \
 from sub_site.app import app, bcrypt_app
 from sub_site.handle_database import main as db_main
 from sub_site.handle_login import main as login_main
+from sub_site.handle_submissions import main as submission_main
 from sub_site.users import User
 
-
+submission_main(app)
 query_db = db_main(app)
 login_manager, LoginForm, CreateUserForm = login_main(app, bcrypt_app)
 
