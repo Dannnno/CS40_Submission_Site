@@ -1,3 +1,5 @@
+import os
+
 from flask import render_template, redirect, url_for, g
 from flask.ext.login import current_user, login_user, logout_user, \
     login_required
@@ -5,8 +7,9 @@ from flask.ext.login import current_user, login_user, logout_user, \
 from sub_site.app import app, bcrypt_app
 from sub_site.handle_database import main as db_main
 from sub_site.handle_login import main as login_main
-from sub_site.handle_submissions import main as submission_main
+from sub_site.handle_submissions import main as submission_main, UPLOAD_FOLDER
 from sub_site.users import User
+
 
 submission_main(app)
 query_db = db_main(app)
@@ -62,6 +65,8 @@ def login():
                 error = "No such user"
             else:
                 login_user(user)
+                app.config['UPLOAD_FOLDER'] = os.path.join(
+                    UPLOAD_FOLDER, current_user.username)
                 return redirect(url_for('success'))
     return render_template('login.html', form=form, error=error)
 
