@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS submissions;
 
 CREATE TABLE submissions (
     userid INTEGER PRIMARY KEY,
-    submissionid INTEGER,
+    assignmentid INTEGER,
     filepath TEXT NOT NULL,
     time_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     grade_received NUMERIC DEFAULT NULL
@@ -29,5 +29,6 @@ DROP TABLE IF EXISTS assignments;
 CREATE TABLE assignments(
     assignmentid INTEGER PRIMARY KEY AUTOINCREMENT,
     due_date DATE NOT NULL,
-    point_value INTEGER NOT NULL
+    point_value INTEGER NOT NULL,
+    grader_filepath TEXT NOT NULL
 );

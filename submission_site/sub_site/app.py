@@ -8,8 +8,8 @@ from submission_site.sub_site import parent_directory
 
 _templates = os.path.join(parent_directory, 'templates')
 _static = os.path.join(parent_directory, 'static')
-_secret = os.path.join(parent_directory, 'secret.txt')
+
 app = Flask(__name__, template_folder=_templates, static_folder=_static)
-with open(_secret, 'r') as _secret_key_file:
-    app.secret_key = _secret_key_file.read()
+app.config.from_object('submission_site.config')
+
 bcrypt_app = Bcrypt(app)

@@ -2,7 +2,7 @@
 {% block title %}CS 40 Submission Site - Create New Account{% endblock %}
 {% block content %}
 	<h1>Create an account</h1>
-	<form method="POST" action='{{ url_for("new_account") }}'>
+	<form method="POST" action='{{ url_for("create_account") }}'>
 		{{ form.hidden_tag() }}
 		Username {{ form.username }}<br>
 		Password {{ form.password }}<br>
