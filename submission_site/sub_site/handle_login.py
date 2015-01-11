@@ -1,12 +1,12 @@
 import re
 
-from flask.ext.login import LoginManager, current_user, login_required, \
-    login_user, UserMixin, logout_user
-from flask.ext.wtf import Form
 from wtforms import StringField, BooleanField, PasswordField
 from wtforms.validators import InputRequired, EqualTo
 
-from sub_site.handle_database import main as db_main
+from flask.ext.login import LoginManager
+from flask.ext.wtf import Form
+
+from submission_site.sub_site.handle_database import main as db_main
 
 
 good_password = re.compile('[\w\d!@#\$%\^&\*\-_=\+]')

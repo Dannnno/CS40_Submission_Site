@@ -3,4 +3,6 @@ flask-login
 flask-admin
 flask-bcrypt
 flask-wtf
+flask-webtest
 wtforms
+py_w3c

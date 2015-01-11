@@ -1,9 +1,9 @@
 import os
 
 from flask import Flask
-from flask.ext.bcrypt import Bcrypt
 
-from sub_site import parent_directory
+from flask.ext.bcrypt import Bcrypt
+from submission_site.sub_site import parent_directory
 
 
 _templates = os.path.join(parent_directory, 'templates')

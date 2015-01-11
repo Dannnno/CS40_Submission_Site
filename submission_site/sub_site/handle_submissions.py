@@ -2,11 +2,11 @@ import os
 
 from flask import request, redirect, url_for, render_template, \
     send_from_directory
-from flask.ext.login import login_required, current_user
 from werkzeug import secure_filename
+from flask.ext.login import login_required, current_user
 
-from sub_site import parent_directory
-from sub_site.handle_database import main as db_main
+from submission_site.sub_site import parent_directory
+from submission_site.sub_site.handle_database import main as db_main
 
 
 UPLOAD_FOLDER = os.path.join(parent_directory, 'submissions')

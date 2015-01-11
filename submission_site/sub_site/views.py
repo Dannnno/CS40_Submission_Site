@@ -1,14 +1,16 @@
 import os
 
 from flask import render_template, redirect, url_for, g
+
 from flask.ext.login import current_user, login_user, logout_user, \
     login_required
 
-from sub_site.app import app, bcrypt_app
-from sub_site.handle_database import main as db_main
-from sub_site.handle_login import main as login_main
-from sub_site.handle_submissions import main as submission_main, UPLOAD_FOLDER
-from sub_site.users import User
+from submission_site.sub_site.app import app, bcrypt_app
+from submission_site.sub_site.handle_database import main as db_main
+from submission_site.sub_site.handle_login import main as login_main
+from submission_site.sub_site.handle_submissions import main as \
+    submission_main, UPLOAD_FOLDER
+from submission_site.sub_site.users import User
 
 
 submission_main(app)
