@@ -13,6 +13,7 @@ SECRET_KEY = get_secret_key()
 DATABASE = os.path.join(dirname, 'submissions.db')
 SCHEMA = os.path.join(dirname, 'schema.sql')
 UPLOAD_FOLDER = os.path.join(dirname, 'submissions')
-CURRENT_UPLOAD_FOLDER = None
+ALLOWED_EXTENSIONS = ['py', 'js', 'html', 'css', 'png', 'jpg', 'jpeg', 'gif',
+                      'htm', 'txt', 'csv', 'pdf', 'json', 'xml', 'xhtml']
 
 

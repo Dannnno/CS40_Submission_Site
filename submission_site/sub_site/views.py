@@ -1,21 +1,15 @@
 import os
 
-from flask import render_template, redirect, url_for, g
-
-from flask.ext.login import current_user, login_user, logout_user, \
-    login_required
+from flask import render_template, redirect, url_for, flash, request
+from flask_login import login_required, logout_user, login_user, \
+    current_user
 
 from submission_site.sub_site.app import app, bcrypt_app
-from submission_site.sub_site.handle_database import main as db_main
-from submission_site.sub_site.handle_login import main as login_main
-from submission_site.sub_site.handle_submissions import main as \
-    submission_main, UPLOAD_FOLDER
+from submission_site.sub_site.handle_database import query_db, init_db
+from submission_site.sub_site.handle_login import LoginForm, login_manager, \
+    CreateUserForm
 from submission_site.sub_site.users import User
-
-
-submission_main(app)
-query_db = db_main(app)
-login_manager, LoginForm, CreateUserForm = login_main(app, bcrypt_app)
+import submission_site.sub_site.handle_submissions
 
 
 @login_manager.user_loader
@@ -24,84 +18,100 @@ def load_user(userid):
 
 
 @app.before_first_request
-def load_all_users():
-    query = "SELECT * FROM users"
+def init_db_load_users():
+    query = "SELECT userid, username FROM users"
     results = query_db(query)
-    for userid, username, _ in results:
+    for userid, username in results:
         User(userid, username)
-
-
-@app.before_request
-def before_request():
-    g.user = current_user
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    if current_user.is_authenticated():
-        return render_template('index.html')
-    else:
-        return redirect(url_for('login'))
-
-
-@app.route('/success')
-def success():
-    return 'working'
+    return render_template('index.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated():
         return redirect(url_for('index'))
-    form = LoginForm()
+    if request.method == 'POST':
+        return _handle_login(LoginForm())
+    return render_template('login.html', form=LoginForm())
+
+
+def _handle_login(form):
     error = None
     try:
         valid_form = form.validate_on_submit()
     except IndexError:
-        return redirect(url_for('new_account'))
+        # There are no entries in the database
+        flash("You need to create an account before you can login")
+        return redirect(url_for('create_account'))
     else:
         if valid_form:
-            userid = query_db("SELECT userid FROM users WHERE username=?",
-                              [form.username.data])[0][0]
-            user = load_user(userid)
-            if user is None:
-                error = "No such user"
+            userid = User.get_id_by_name(form.username.data)
+            if userid is None:
+                error = "No such user {}".format(form.username.data)
             else:
-                login_user(user)
-                app.config['UPLOAD_FOLDER'] = os.path.join(
-                    UPLOAD_FOLDER, current_user.username)
+                user = load_user(userid)
+                login_user(user, remember=form.remember.data)
+                app.config['CURRENT_UPLOAD_FOLDER'] = \
+                    os.path.join(app.config['UPLOAD_FOLDER'],
+                                 form.username.data)
+                flash('login successful')
                 return redirect(url_for('index'))
     return render_template('login.html', form=form, error=error)
 
 
-@app.route('/new_account', methods=['GET', 'POST'])
-def new_account():
+@app.route('/logout')
+def logout():
+    if current_user.is_authenticated():
+        logout_user()
+        app.config['CURRENT_UPLOAD_FOLDER'] = None
+        return render_template('logout.html')
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
     form = CreateUserForm()
     if form.validate_on_submit():
-        create_user(form.username.data, form.password.data)
+        _create_user(form.username.data, form.password.data)
         return redirect(url_for('index'))
     return render_template(
         "create.html", form=form, error="Invalid username or password")
 
 
-def create_user(username, password):
-    insert_query = "INSERT INTO users (username, passwordhash)  VALUES (?, ?)"
-    insert_args = (username, bcrypt_app.generate_password_hash(password))
-    select_query = "SELECT userid FROM users WHERE username=?"
-    select_args = (username,)
-    query_db(insert_query, insert_args)
-    userid = query_db(select_query, select_args)
-    User(userid, username)
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
+def _create_user(username, password):
+    query = "INSERT INTO users (username, passwordhash) VALUES (?, ?)"
+    hashed_password = bcrypt_app.generate_password_hash(password)
+    args = username, hashed_password
+    _ = query_db(query, args)[0][0]
+    user_id = query_db("SELECT userid FROM users WHERE username=?",
+                       [username])[0][0]
+    User(user_id, username)
 
 
 @app.route('/static/<name>')
-def serve_static_files(name):
+def serve_static_file(name):
     return app.send_static_file(name)
+
+
+@app.route('/add_assignment')
+@login_required
+def add_assignment():
+    return 'success'
+
+
+@app.route('/view_assignments')
+@login_required
+def view_assignments():
+    return 'success'
+
+
+@app.route('/gradebook')
+@login_required
+def gradebook():
+    return 'success'
