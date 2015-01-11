@@ -5,3 +5,21 @@ CREATE TABLE users (
     username TEXT NOT NULL UNIQUE,
     passwordhash TEXT NOT NULL
 );
+
+DROP TABLE IF EXISTS submissions;
+
+CREATE TABLE submissions (
+    userid INTEGER PRIMARY KEY,
+    submissionid INTEGER,
+    filepath TEXT NOT NULL,
+    time_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    grade_received NUMERIC DEFAULT NULL
+);
+
+DROP TABLE IF EXISTS actions;
+
+CREATE TABLE actions ()
+    userid INTEGER PRIMARY KEY,
+    action TEXT NOT NULL,
+    time_submitted TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

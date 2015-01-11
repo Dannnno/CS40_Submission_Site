@@ -16,7 +16,7 @@ def main(app):
         with sqlite3.connect(DATABASE) as conn:
             if not _database_exists:
                 init_db(conn)
-                _database_exists = os.path.exists(DATABASE)
+            _database_exists = True
             return conn
 
     def init_db(db):

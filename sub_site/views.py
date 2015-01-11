@@ -50,6 +50,8 @@ def success():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated():
+        return redirect(url_for('index'))
     form = LoginForm()
     error = None
     try:
@@ -67,7 +69,7 @@ def login():
                 login_user(user)
                 app.config['UPLOAD_FOLDER'] = os.path.join(
                     UPLOAD_FOLDER, current_user.username)
-                return redirect(url_for('success'))
+                return redirect(url_for('index'))
     return render_template('login.html', form=form, error=error)
 
 
@@ -75,10 +77,20 @@ def login():
 def new_account():
     form = CreateUserForm()
     if form.validate_on_submit():
-        print form, vars(form)
-        return redirect(url_for('success'))
+        create_user(form.username.data, form.password.data)
+        return redirect(url_for('index'))
     return render_template(
         "create.html", form=form, error="Invalid username or password")
+
+
+def create_user(username, password):
+    insert_query = "INSERT INTO users (username, passwordhash)  VALUES (?, ?)"
+    insert_args = (username, bcrypt_app.generate_password_hash(password))
+    select_query = "SELECT userid FROM users WHERE username=?"
+    select_args = (username,)
+    query_db(insert_query, insert_args)
+    userid = query_db(select_query, select_args)
+    User(userid, username)
 
 
 @app.route('/logout')
