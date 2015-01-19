@@ -52,5 +52,7 @@ def _resolve_duplicates(name_maps):
         return duplicates_removed
 
 
-def voodoo(function_name):
-    pass
+def voodoo(module, function_name):
+    exec("ret_function = {}.{}".format(module, function_name),
+         globals=globals(), locals=locals())
+    return ret_function
