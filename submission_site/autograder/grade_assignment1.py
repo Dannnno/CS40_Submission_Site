@@ -1,9 +1,10 @@
 from importlib import import_module
 from inspect import getmembers, ismethod
 
+from flask.ext.login import current_user
+
 from ..utilities import extract_function_names, voodoo, \
     normalize_filenames
-
 from .. import TestFunction
 
 
@@ -13,8 +14,10 @@ files = {'ps1.py': 0}
 def grade(submitted_files):
     submitted_files = normalize_filenames(submitted_files, files)
     try:
-        ps1 = import_module(submitted_files['ps1.py'].partition('.')[0],
-                            package='submission_site.submissions'
+        ps1 = import_module(
+            submitted_files['ps1.py'].partition('.')[0],
+            package='submission_site.submissions.{}'.format(
+                current_user.username)
     except ImportError:
         pass
     except KeyError:
@@ -23,7 +26,7 @@ def grade(submitted_files):
         functions = extract_function_names(ps1)
         function1 = voodoo(ps1, functions[0])
         test = TestFunctionOne(function1, "Function 1 of Problem Set 1"))
-        print test.tests
+        return test.tests
 
 
 class TestFunctionOne(TestFunction):
