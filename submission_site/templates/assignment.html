@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Assignment {{ assignmentid }}{% endblock %}
+{% block content %}
+	{% for res in result %}
+		<div>{{ res }}</div>
+	{% endfor %}
+{% endblock %}

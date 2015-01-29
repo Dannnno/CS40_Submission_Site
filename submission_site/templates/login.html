@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}CS 40 Submission Site - Login Page{% endblock %}
+{% block content %}
+	<h1>Login Page</h1>
+	<form method="POST" action='{{ url_for("login") }}'>
+		{{ form.hidden_tag() }}
+		Username {{ form.username }}<br>
+		Password {{ form.password }}<br>
+		Remember Me {{ form.remember }}<br>
+		<input type=submit name='submit' value='Submit'>
+	</form>
+{% endblock %}

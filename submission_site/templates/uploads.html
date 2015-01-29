@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block head %}
+<link type='text/css' rel='stylesheet' href='{{ url_for("static", filename="upload_page.css") }}'/>
+{% endblock %}
+{% block title %} {{ current_user.username }}'s Uploaded Files {% endblock %}
+{% block content %}
+	<h1>Files that have been uploaded by {{ current_user.username }}</h1>
+	<table>
+		<tr>
+			<td> File submitted </td>
+			<td> Date submitted </td>
+			<td> Grade </td>
+		</tr>
+		{% for file_ in directory %}
+			<tr>
+				<td>{{ file_ }}</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}
